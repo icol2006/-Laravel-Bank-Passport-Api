@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Ramsey\Uuid\Type\Integer;
 
 class Account extends Model
 {
@@ -43,6 +45,16 @@ class Account extends Model
         $timestamp = nowLocal()->getTimestamp();
         $userId = $this->user_id;
         $this->account_number = "{$timestamp}{$userId}";
+    }
+
+    public  function Register(int $user_id,string $name="", int $current_balance=0) : Account {
+        $this->account_number=Str::uuid();
+        $this->name=$name;
+        $this->current_balance=$current_balance;
+        $this->user_id=$user_id;
+        $this->save();
+
+        return $this;
     }
 
     /**

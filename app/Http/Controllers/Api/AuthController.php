@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -19,11 +20,15 @@ class AuthController extends Controller
      */
     public function saveUser(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|unique:users,email',
-            'password' => 'required'
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required',
         ]);
+        if ($validator->fails())
+        {
+            return response(['errors'=>$validator->errors()->all()], 422);
+        }
 
         User::create([
             'name' => $request->name,
@@ -43,10 +48,15 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+
+        if ($validator->fails())
+        {
+            return response(['errors'=>$validator->errors()->all()], 422);
+        }
 
         $credentials = request(['email', 'password']);
 
@@ -70,7 +80,7 @@ class AuthController extends Controller
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse($token->expires_at)->toDateTimeString()
-        ]);
+        ],200);
     }
 
     /**
@@ -96,4 +106,10 @@ class AuthController extends Controller
     {
         return response()->json(auth()->user());
     }
+
+    public function test(Request $request)
+    {
+        return "lkjx";
+    }
+
 }

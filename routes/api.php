@@ -22,7 +22,17 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => 'auth:api'
+    'middleware' => ['auth:api','AccountOwner']
 ], function() {
     Route::get('user', 'AuthController@user');
+    Route::get('test', 'AuthController@test');   
+
+    Route::prefix('account')->group(function () {
+        Route::get('/', 'AccountsController@getall');
+        Route::get('/{account}', 'AccountsController@getById');
+        Route::post('/', 'AccountsController@save');
+        Route::get('/{account}/movements', 'AccountsMovementsController@getAllByAccountId');
+        Route::post('/{account}/movements', 'AccountsMovementsController@save');
+    });
+
 });
